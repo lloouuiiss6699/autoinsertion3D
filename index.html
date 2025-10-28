@@ -5,24 +5,20 @@
   <title>art</title>
   <style>
     body { margin: 0; overflow: hidden; }
-    canvas { display: block; }
-    iframe {
-      border: none;
-      width: 800px;
-      height: 600px;
-    }
+    iframe { border: none; width: 800px; height: 600px; }
   </style>
 </head>
 <body>
-  <!-- Include Three.js and CSS3DRenderer -->
+  <!-- Three.js core -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/renderers/CSS3DRenderer.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/controls/OrbitControls.js"></script>
+  <!-- Non-module CSS3DRenderer -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/js/renderers/CSS3DRenderer.js"></script>
+  <!-- Non-module OrbitControls -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/js/controls/OrbitControls.js"></script>
 
   <script>
+    // Scene & Camera
     const scene = new THREE.Scene();
-
-    // Camera
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 5000);
     camera.position.set(0, 300, 1000);
 
@@ -37,32 +33,23 @@
     controls.maxDistance = 3000;
     controls.enablePan = true;
 
-    // Room walls with iframes
+    // Wall positions: back, left, right
     const wallPositions = [
-      { x: 0, y: 300, z: -500, ry: 0 },   // Back wall
-      { x: -600, y: 300, z: 0, ry: Math.PI / 2 }, // Left wall
-      { x: 600, y: 300, z: 0, ry: -Math.PI / 2 }, // Right wall
+      { x: 0, y: 300, z: -500, ry: 0 },        // Back wall
+      { x: -600, y: 300, z: 0, ry: Math.PI/2 }, // Left wall
+      { x: 600, y: 300, z: 0, ry: -Math.PI/2 }  // Right wall
     ];
 
     wallPositions.forEach(pos => {
       const iframe = document.createElement('iframe');
       iframe.src = 'https://autoinsertion.me';
-
       const cssObject = new THREE.CSS3DObject(iframe);
       cssObject.position.set(pos.x, pos.y, pos.z);
       cssObject.rotation.y = pos.ry;
       scene.add(cssObject);
     });
 
-    // Floor (just a plane for reference)
-    const floorGeometry = new THREE.PlaneGeometry(2000, 2000);
-    const floorMaterial = new THREE.MeshBasicMaterial({ color: 0xeeeeee });
-    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = 0;
-    // Optionally add to scene as Mesh, not necessary for CSS3D
-
-    // Animate
+    // Animation loop
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
@@ -70,7 +57,7 @@
     }
     animate();
 
-    // Handle resize
+    // Handle window resize
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
